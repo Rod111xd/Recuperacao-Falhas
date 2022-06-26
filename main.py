@@ -1,8 +1,6 @@
 
 INPUT_FILE = "in.txt"
 
-# Ler entrada e retornar operações
-
 class Log:
     def __init__(self):
         self.histories = []
@@ -16,6 +14,7 @@ class Recovery:
         if input_file:
             self.loadInput(input_file)
 
+    # Ler entrada e retornar operações
     def loadInput(self, input_file):
         f = open(input_file, "r")
         lines = f.read().split("\n")
