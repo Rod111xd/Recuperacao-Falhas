@@ -1,5 +1,5 @@
 
-INPUT_FILE = "in.txt"
+INPUT_FILE = "in2.txt"
 
 class Log:
     def __init__(self):
@@ -10,6 +10,7 @@ class Recovery:
         self.Log = Log()
         self.listaRedo = []    # Ids de transações commited
         self.listaUndo = []    # Ids de transações ativas
+        self.rollbacked = []    # Ids de transações que sofreram rollback
         self.dados = {}        # Objetos de dados e valores
         if input_file:
             self.loadInput(input_file)
@@ -25,6 +26,8 @@ class Recovery:
 
         try:
             for l in lines:
+                l = l.replace("[","")
+                l = l.replace("]","")
                 l = l.replace(" ","")
                 l = l.split("|")
                 l = tuple(x for x in l)
@@ -45,7 +48,12 @@ class Recovery:
             transactions.add(tr)
             if op == 'r' or op == 'w':
                 obj = h[4]
-                self.dados[obj] = ''
+                try:
+                    self.dados[obj]
+                except:
+                    self.dados[obj] = h[5]
+            if op == 'a':
+                self.rollbacked.append(tr)
             elif op == 'c':
                 transactions_commited.add(tr)
 
@@ -61,10 +69,15 @@ class Recovery:
         log_inv = log[::-1]
         listaRedo = self.listaRedo
         listaUndo = self.listaUndo
+        rollbacked = self.rollbacked
         dados = self.dados
+
+        listaUndo = [x for x in listaUndo if x not in rollbacked]
+        listaRedo = [x for x in listaRedo if x not in rollbacked]
 
         print("Lista Redo: ", listaRedo)
         print("Lista Undo: ", listaUndo)
+        print("Lista Rollbacked: ", rollbacked)
         print()
 
         # Varredura backward
